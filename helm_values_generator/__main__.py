@@ -9,5 +9,5 @@ if __name__ == "__main__":
 
     SCAN_PATH = sys.argv[1]
 
-    res_yaml = generate_values(SCAN_PATH)
+    res_yaml = generate_values(SCAN_PATH) # pylint: disable=E1102
     print(res_yaml)

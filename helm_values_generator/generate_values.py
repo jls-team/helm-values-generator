@@ -67,8 +67,8 @@ def generate_values(path_to_scan):
     strings = []
 
     for yaml_file in all_yamls:
-        with open(yaml_file, "r", encoding="utf8") as f:
-            strings = re.findall(r"\{\{(.*?)\}\}", f.read())
+        with open(yaml_file, "r", encoding="utf8") as file_content:
+            strings = re.findall(r"\{\{(.*?)\}\}", file_content.read())
 
     unique_list = list(set(strings))
 
