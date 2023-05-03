@@ -1,11 +1,20 @@
+""" The generator module """
 import os
 import re
 import sys
 
 
 def find_yaml_files(directory):
+    """Finds all yaml files by extension in directory
+
+    Args:
+        directory (str): directory to look in
+
+    Returns:
+        list: yaml files paths
+    """
     yaml_files = []
-    for root, dirs, files in os.walk(directory):
+    for root, _, files in os.walk(directory):
         for file in files:
             if file.endswith(".yaml") or file.endswith(".yml"):
                 yaml_files.append(os.path.join(root, file))
@@ -13,6 +22,14 @@ def find_yaml_files(directory):
 
 
 def convert_to_yaml(keys):
+    """Converts list values to yaml
+
+    Args:
+        keys (list): list of keys like ["key", "key1.key2"]
+
+    Returns:
+        str: yaml content
+    """
     data = {}
     for key in keys:
         keys_list = key.split(".")
@@ -36,41 +53,53 @@ def convert_to_yaml(keys):
     return _convert_to_yaml_helper(data).rstrip()
 
 
-def do_trim(value):
-    has_filters = value.find("|")
-    if has_filters > -1:
-        value = value[0:has_filters]
-
-    return value.replace(".Values.", "").strip()
-
-
 def generate_values(path_to_scan):
+    """Generates list of helm Values placeholders
+
+    Args:
+        path_to_scan (str): path of yaml file
+
+    Returns:
+        list: list of found values
+    """
     all_yamls = find_yaml_files(path_to_scan)
 
     strings = []
-    
+
     for yaml_file in all_yamls:
-        with open(yaml_file, "r") as f:
+        with open(yaml_file, "r", encoding="utf8") as f:
             strings = re.findall(r"\{\{(.*?)\}\}", f.read())
 
-    uniqueList = list(set(strings))
-    uniqueList = list(map(do_trim, uniqueList))
+    unique_list = list(set(strings))
 
-    uniqueList.sort()
+    def _do_trim(value):
+        has_filters = value.find("|")
+        if has_filters > -1:
+            value = value[0:has_filters]
 
-    res_yaml = convert_to_yaml(uniqueList)
+        return value.replace(".Values.", "").strip()
+
+
+    unique_list = list(map(_do_trim, unique_list))
+
+    unique_list.sort()
+
+    res_yaml = convert_to_yaml(unique_list)
     return res_yaml
-    
+
+
 def main():
+    """Init
+    """
     if len(sys.argv) == 1:
         print("No path to scan provided, run like python main.py <path>")
         sys.exit(1)
-    
+
     path_to_scan = sys.argv[1]
 
     res_yaml = generate_values(path_to_scan)
     print(res_yaml)
 
+
 if __name__ == "__main__":
     main()
-
