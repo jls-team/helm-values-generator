@@ -2,7 +2,7 @@
 name = "helm_values_generator"
 version = "0.1.0"
 authors = [
-    { name = "Liudas Sodonis", email = "author@example.com" }]
+    { name = "Liudas Sodonis", email = "liudas.cloud.dev@gmail.com" }]
 description = "Small tool to generate simple values template yaml from helm charts"
 readme = "README.md"
 requires-python = ">=3.7"
