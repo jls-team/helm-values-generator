@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-{{ .Values.jobName }}
+spec:
+  schedule: {{ .Values.cronJob.schedule | quote }}
+  concurrencyPolicy: Allow
+  startingDeadlineSeconds: 100
+  suspend: false
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cronjob-{{ .Values.jobName }}
+            image: {{ .Values.cronJob.container.image }}
+            command:
+            - python
+            - {{ .Values.database.tables }}
+          restartPolicy: OnFailure
+          volumes:
+            - name: {{ .Values.secretName }}
+              secret:
+                secretName: {{ .Values.secretName }}
